@@ -1,33 +1,30 @@
 #!/usr/bin/python3
-"""Module that factorize as many numbers as possible
- into a product of two smaller numbers."""
-from sys import argv
+import math
+import sys
+import subprocess
 
 
-def factorize(value):
-    """"print a simple descomposition of an integer > 1"""
-    i = 2
+def get_primes(args):
+    if len(args) != 3:
+        prime2 = math.prod(int(a) for a in args[2:])
+    else:
+        prime2 = int(args[2])
 
-    if value < 2:
-        return
-    print()
-    print(value, "<- value-bef")
-    while value % i:
-        i += 1
-    print("{:.0f}={:.0f}*{:.0f}".format(value, value / i, i))
-    print(value, "<- value-aft")
-    print()
+    prime1 = int(args[1])
+    num = args[0].replace(':', '=')
 
-if len(argv) != 2:
-    exit()
+    prime2, prime1 = sorted([prime1, prime2])
 
-try:
-    with open(argv[1]) as file:
-        line = file.readline()
+    return f"{num}{prime1}*{prime2}"
 
-        while line != "":
-            value = int(line.split('\n')[0])
-            factorize(value)
-            line = file.readline()
-except:
-    pass
+
+if len(sys.argv) != 2:
+    print('Usage: factors <file>')
+    sys.exit(1)
+
+with open(sys.argv[1], 'r') as file:
+    numbers = file.read().splitlines()
+    for number in numbers:
+        result = subprocess.run(['factor', number], capture_output=True, text=True)
+        output = result.stdout.strip().split(' ')
+        print(get_primes(output))
